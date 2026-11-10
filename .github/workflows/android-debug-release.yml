@@ -1,0 +1,53 @@
+name: Android Debug Release (testing only)
+# Publishes a DEBUG-signed APK as a pre-release so it can be sideloaded for testing.
+# Not for distribution: use android-release.yml (production keystore) for real releases.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Test version label, e.g. 1.0.0-rc1'
+        required: true
+        default: '1.0.0-rc1'
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Test and build debug APK
+        working-directory: AndroidController
+        run: ./gradlew --no-daemon testDebugUnitTest assembleDebug -PappVersionName=${{ inputs.version }}
+      - name: Package
+        run: |
+          mkdir dist
+          out="dist/PSPController-android-v${{ inputs.version }}-debug.apk"
+          cp AndroidController/app/build/outputs/apk/debug/*.apk "$out"
+          (cd dist && sha256sum "$(basename "$out")" > "$(basename "$out").sha256")
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android-debug-release-files
+          path: dist/*
+          if-no-files-found: error
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: android-debug-release-files
+          path: dist
+      - name: Publish pre-release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "android-v${{ inputs.version }}-debug" dist/* --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+            --title "PSP Controller (Android) v${{ inputs.version }} - debug build" --prerelease \
+            --notes "Debug-signed APK for testing only. Allow installs from unknown sources to sideload. Not tested on real hardware yet."
