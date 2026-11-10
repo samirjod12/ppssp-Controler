@@ -1,0 +1,73 @@
+name: Windows Release
+on:
+  push:
+    tags: ['windows-v*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version, e.g. 1.0.0 or 1.0.0-rc1 (a "-" suffix makes it a pre-release)'
+        required: true
+        default: '1.0.0-rc1'
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: windows-latest
+    outputs:
+      version: ${{ steps.ver.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: ver
+        shell: pwsh
+        run: |
+          if ($env:GITHUB_REF_TYPE -eq 'tag') { $v = $env:GITHUB_REF_NAME -replace '^windows-v','' } else { $v = '${{ inputs.version }}' }
+          if ($v -notmatch '^\d+\.\d+\.\d+(-[0-9A-Za-z.]+)?$') { throw "Bad version '$v'" }
+          "version=$v" >> $env:GITHUB_OUTPUT
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - run: dotnet restore WindowsReceiver/PSPReceiver.sln
+      - run: dotnet test WindowsReceiver/PSPReceiver.sln -c Release --no-restore
+      - name: Publish self-contained win-x64 single file
+        shell: pwsh
+        run: |
+          dotnet publish WindowsReceiver/PSPReceiver/PSPReceiver.csproj -c Release -r win-x64 --self-contained true `
+            -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:Version=${{ steps.ver.outputs.version }} -o publish
+          if (-not (Test-Path publish/PSPReceiver.exe)) { throw 'PSPReceiver.exe was not produced' }
+      - name: Package ZIP + checksum
+        shell: pwsh
+        run: |
+          $v = '${{ steps.ver.outputs.version }}'
+          New-Item -ItemType Directory -Force dist, publish/Documentation | Out-Null
+          Copy-Item README.md, LICENSE publish/
+          Copy-Item Documentation/* publish/Documentation/ -ErrorAction SilentlyContinue
+          Copy-Item Protocol/NETWORK_PROTOCOL.md publish/Documentation/
+          $zip = "dist/PSPReceiver-windows-v$v-win-x64.zip"
+          Compress-Archive -Path publish/* -DestinationPath $zip
+          if (-not (Test-Path $zip)) { throw 'ZIP missing' }
+          $hash = (Get-FileHash $zip -Algorithm SHA256).Hash.ToLower()
+          "$hash  $(Split-Path $zip -Leaf)" | Out-File -Encoding ascii "$zip.sha256"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-release-files
+          path: dist/*
+          if-no-files-found: error
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: windows-release-files
+          path: dist
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          V: ${{ needs.build.outputs.version }}
+        run: |
+          pre=""; case "$V" in *-*) pre="--prerelease";; esac
+          gh release create "windows-v$V" dist/* --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+            --title "PSP Receiver (Windows) v$V" $pre \
+            --notes "PSP Receiver for Windows x64. Unzip and run PSPReceiver.exe. Not yet tested on real hardware. SHA-256 is in the .sha256 file."
