@@ -13,15 +13,15 @@ Legend: Implemented / Compiled / Unit tested / Hardware tested. Nothing is marke
 | Area | Implemented | Compiled | Unit tested | Hardware tested |
 |---|---|---|---|---|
 | Protocol spec | yes | n/a | n/a | n/a |
-| Message validator, input tracker, key defaults | yes | not yet (CI) | written, not yet run | no |
-| PIN manager, rate limiter, LAN-only filter, WS handshake, settings | yes (Phase 2) | not yet (CI) | written, not yet run | no |
-| WebSocket server (pairing, heartbeat timeout, release on every exit) | yes (Phase 2) | not yet (CI) | loopback integration tests written, not yet run | no |
-| WPF dashboard (start/stop, IP, port, PIN, device, counter, mode, status) | yes (Phase 2) | not yet (CI) | no (UI) | no |
-| SendInput keyboard output (scan codes, shared-key ref-counting, release on every exit) | yes (Phase 3) | not yet (CI) | fake-injector tests written, not yet run | no |
-| Key mapping editor + conflict warning, Test Controller window, tray, start with Windows | yes (Phase 3) | not yet (CI) | settings/bindings tests written; UI and registry not unit tested | no |
-| Android app: PSP-style landscape UI, multi-touch D-pad / face buttons / shoulders / Start / Select, analog stick with dead zone + sensitivity, connect + PIN screen, saved PCs, settings, diagnostics | yes (Phase 4) | not yet (CI) | no (UI) | no |
-| Android networking: WebSocket client, hello/PIN, 1 s heartbeat, dead-link detection, auto-reconnect, release-all on background/disconnect, duplicate-safe input sender | yes (Phase 5) | not yet (CI) | JVM tests written (protocol, analog math, sender, geometry, settings, connection state machine), not yet run | no |
-| Android CI workflow | yes | not yet run | n/a | n/a |
+| Message validator, input tracker, key defaults | yes | yes (CI, Nov 10) | written, passing in CI | no |
+| PIN manager, rate limiter, LAN-only filter, WS handshake, settings | yes (Phase 2) | yes (CI, Nov 10) | written, passing in CI | no |
+| WebSocket server (pairing, heartbeat timeout, release on every exit) | yes (Phase 2) | yes (CI, Nov 10) | loopback integration tests written, passing in CI | no |
+| WPF dashboard (start/stop, IP, port, PIN, device, counter, mode, status) | yes (Phase 2) | yes (CI, Nov 10) | no (UI) | no |
+| SendInput keyboard output (scan codes, shared-key ref-counting, release on every exit) | yes (Phase 3) | yes (CI, Nov 10) | fake-injector tests written, passing in CI | no |
+| Key mapping editor + conflict warning, Test Controller window, tray, start with Windows | yes (Phase 3) | yes (CI, Nov 10) | settings/bindings tests written; UI and registry not unit tested | no |
+| Android app: PSP-style landscape UI, multi-touch D-pad / face buttons / shoulders / Start / Select, analog stick with dead zone + sensitivity, connect + PIN screen, saved PCs, settings, diagnostics | yes (Phase 4) | yes (CI, Nov 10) | no (UI) | no |
+| Android networking: WebSocket client, hello/PIN, 1 s heartbeat, dead-link detection, auto-reconnect, release-all on background/disconnect, duplicate-safe input sender | yes (Phase 5) | yes (CI, Nov 10) | JVM tests passing in CI (protocol, analog math, sender, geometry, settings, connection state machine) | no |
+| Android CI workflow | yes | passing in CI | n/a | n/a |
 | Virtual gamepad backend | no (Phase 7) | no | no | no |
 | Release workflows (android-release, windows-release) | no (Phase 10-11) | no | no | no |
 
