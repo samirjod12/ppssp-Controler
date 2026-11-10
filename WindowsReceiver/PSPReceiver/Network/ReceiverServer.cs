@@ -226,7 +226,7 @@ public sealed class ReceiverServer : IDisposable
             }
             try
             {
-                if (ws is { State: WebSocketState.Open })
+                if (ws is { State: WebSocketState.Open or WebSocketState.CloseReceived }) // CloseReceived: complete the client's close handshake
                 {
                     using var close = new CancellationTokenSource(1000);
                     await ws.CloseAsync(WebSocketCloseStatus.NormalClosure, "bye", close.Token);

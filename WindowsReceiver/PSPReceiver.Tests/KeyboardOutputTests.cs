@@ -140,6 +140,7 @@ public class KeyboardOutputTests
         t.SetAnalog(0, -1);
         t.ReleaseAll();
         Assert.Empty(k.HeldKeys);
-        Assert.True(f.Events.Count(e => !e.Down) >= 2);
+        // Triangle (S) and analog-down (S) share one physical key by default, so exactly one key-up is sent.
+        Assert.Equal(1, f.Events.Count(e => !e.Down));
     }
 }
