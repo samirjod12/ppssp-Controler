@@ -1,0 +1,17 @@
+name: Validate
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  structure:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Required files exist
+        run: |
+          for f in README.md LICENSE Protocol/NETWORK_PROTOCOL.md WindowsReceiver/PSPReceiver.sln; do
+            test -f "$f" || { echo "Missing $f"; exit 1; }
+          done
+      - name: No secrets or keystores committed
+        run: |
+          ! git ls-files | grep -Ei '\.(jks|keystore|p12|pfx)$'

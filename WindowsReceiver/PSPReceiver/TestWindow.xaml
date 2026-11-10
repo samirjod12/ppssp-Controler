@@ -1,0 +1,18 @@
+<Window x:Class="PSPReceiver.TestWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Test Controller" Height="520" Width="460" WindowStartupLocation="CenterOwner"
+        Background="#1E1F22" Foreground="#E6E6E6" FontFamily="Segoe UI">
+    <DockPanel Margin="16">
+        <StackPanel DockPanel.Dock="Top">
+            <TextBlock TextWrapping="Wrap" Foreground="#9AA0A6"
+                       Text="Click the box below, then press buttons on the phone. Keys Windows actually received appear in the log (proves keyboard output works). Self-test sends Z and X without the phone."/>
+            <TextBlock Text="Held by the phone right now:" Foreground="#9AA0A6" Margin="0,12,0,2"/>
+            <TextBlock Text="{Binding ActiveInputs}" FontSize="16" TextWrapping="Wrap"/>
+            <Button Content="Self-test (send Z, X)" Click="OnSelfTest" HorizontalAlignment="Left" Padding="14,6" Margin="0,12,0,8"/>
+            <TextBox x:Name="Capture" IsReadOnly="True" Height="34" FontSize="15" VerticalContentAlignment="Center"
+                     Text="Focus here to capture keys" PreviewKeyDown="OnKeyDown" PreviewKeyUp="OnKeyUp"/>
+        </StackPanel>
+        <ListBox x:Name="LogList" Margin="0,8,0,0" Background="#2B2D31" Foreground="#E6E6E6" FontFamily="Consolas"/>
+    </DockPanel>
+</Window>

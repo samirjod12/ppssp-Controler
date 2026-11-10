@@ -1,0 +1,11 @@
+bin/
+obj/
+.vs/
+TestResults/
+*.jks
+*.keystore
+*.p12
+*.pfx
+local.properties
+.gradle/
+build/
